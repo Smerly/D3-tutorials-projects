@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<body>
+		<svg id="svg" width="1000" height="1000">
+			<circle cx="250" cy="250" r="123" fill="#0ff" />
+		</svg>
+		<script src="https://d3js.org/d3.v7.min.js"></script>
+		<script>
+			function makeRandomData(n) {
+				const newArr = [];
+				for (let i = 0; i < n; i++) {
+					newArr.push({
+						a: Math.random() * (1 - 0) + 0,
+						b: Math.random() * (1 - 0) + 0,
+						c: Math.random() * (1 - 0) + 0,
+					});
+				}
+				return newArr;
+			}
+			const data = makeRandomData(5);
+			console.log(data);
+
+			d3.select('#svg')
+				.style('border', '1px solid #000')
+
+				.selectAll('rect') // Select all rectangles in the svg
+				.data(data) // put data
+				.enter() // enter
+				.append('ellipse') // add it
+				.attr('cx', (d, i) => (i * 500) / data.length)
+				.attr('cy', (d) => d.a * 500)
+
+				.attr('fill', (d) => {
+					if (d.b < 0.25) {
+						return 'green';
+					} else if (d.b < 0.5) {
+						return 'red';
+					} else if (d.b < 0.75) {
+						return 'blue';
+					} else if (d.b < 1) {
+						return 'yellow';
+					}
+				})
+				.attr('opacity', '0.5')
+				.attr('stroke-width', (d) => 10 * d.b)
+				.attr('stroke', (d) => `hsl(${360 * d.b}, 100%, 50%)`)
+				// .attr('r', (d) => `${d.a * 80}`)
+				.attr('rx', (d) => `${d.a * 80}`)
+				.attr('ry', (d) => `${d.b * 100}`);
+		</script>
+	</body>
+</html>

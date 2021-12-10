@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<body>
+		<svg width="600" height="300"></svg>
+		<script src="https://d3js.org/d3.v7.min.js"></script>
+		<script>
+			function convertToArray(obj) {
+				const arr = [];
+				for (const property in obj) {
+					arr.push({
+						month: property,
+						temp: obj[property],
+					});
+				}
+				arr.shift();
+				arr.shift();
+				return arr;
+			}
+			async function handleData() {
+				// Data setting
+				const width = 600;
+				const height = 300;
+				const margin = 40;
+				const data = await d3.csv(
+					'Weather Data in India from 1901 to 2017.csv'
+				);
+				const year_1901 = data[0];
+				const months_1901 = convertToArray(year_1901);
+				console.log(months_1901);
+
+				// Variable tools
+
+				// Scales
+
+				const xscale = d3
+					.scaleLinear()
+					.domain([0, months_1901.length - 1])
+					.range([margin, width - margin]);
+
+				const yscale = d3
+					.scaleLinear()
+					.domain(d3.extent(months_1901, (d) => d.temp))
+					.range([height - margin, margin]);
+
+				const monthsScale = d3
+					.scaleTime()
+					.domain([new Date('1901-01-01'), new Date('1901-12-01')])
+					.range([margin, width - margin])
+					.nice();
+
+				// Axis
+				const bottomAxis = d3.axisBottom(monthsScale);
+				const leftAxis = d3.axisLeft(yscale);
+
+				// Line generator
+
+				const linegen = d3
+					.area()
+					.x((d, i) => xscale(i))
+					.y0((d) => yscale(d.temp))
+					.y1(height - margin)
+					.curve(d3.curveBasis);
+				// Making stuff
+
+				const svg = d3.select('#svg');
+				const graph = svg.append('g');
+				graph
+					.append('path')
+					.attr('d', linegen(months_1901))
+					.attr('stroke-width', 1)
+					.attr('stroke', 'cornflowerblue')
+					.attr('fill', 'none')
+					.attr('fill', 'red');
+
+				svg
+					.append('g')
+					.attr('transform', `translate(0, ${height - margin})`)
+					.call(bottomAxis);
+
+				svg
+					.append('g')
+					.attr('transform', `translate(${margin}, 0)`)
+					.call(leftAxis);
+			}
+
+			handleData();
+		</script>
+	</body>
+</html>
